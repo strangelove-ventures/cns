@@ -1,0 +1,12 @@
+syntax = "proto3";
+package strangeloveventures.cns.cns;
+
+import "gogoproto/gogo.proto";
+
+option go_package = "github.com/strangelove-ventures/cns/x/cns/types";
+
+// Params defines the parameters for the module.
+message Params {
+  option (gogoproto.goproto_stringer) = false;
+  
+}
