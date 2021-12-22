@@ -15,6 +15,9 @@ const (
 
 	// MemStoreKey defines the in-memory store key
 	MemStoreKey = "mem_cns"
+
+	// RegisteredChainsKeyPrefix is the prefix to retrieve all RegisteredChains
+	RegisteredChainsKeyPrefix = "RegisteredChains/value/"
 )
 
 func KeyPrefix(p string) []byte {

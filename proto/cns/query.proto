@@ -3,17 +3,31 @@ package strangeloveventures.cns.cns;
 
 import "gogoproto/gogo.proto";
 import "google/api/annotations.proto";
-import "cosmos/base/query/v1beta1/pagination.proto";
 import "cns/params.proto";
+import "cns/registeredChains.proto";
+import "cosmos/pagination.proto";
 // this line is used by starport scaffolding # 1
 
 option go_package = "github.com/strangelove-ventures/cns/x/cns/types";
 
+// TODO this query stuff may need revised?
 // Query defines the gRPC querier service.
 service Query {
   // Parameters queries the parameters of the module.
   rpc Params(QueryParamsRequest) returns (QueryParamsResponse) {
     option (google.api.http).get = "/strangeloveventures/cns/cns/params";
+  }
+  // Queries a registered chain from RegisteredChains.
+  rpc RegisteredChain(QueryRegisteredChainRequest)
+      returns (QueryRegisteredChainResponse) {
+    option (google.api.http).get =
+        "/strangeloveventures/cns/cns/registered_chain/{chainID}";
+  }
+  // Queries a list of RegisteredChains items.
+  rpc RegisteredChainsAll(QueryAllRegisteredChainsRequest)
+      returns (QueryAllRegisteredChainsResponse) {
+    option (google.api.http).get =
+        "/strangeloveventures/cns/cns/registered_chains";
   }
   // this line is used by starport scaffolding # 2
 }
@@ -24,7 +38,20 @@ message QueryParamsRequest {}
 // QueryParamsResponse is response type for the Query/Params RPC method.
 message QueryParamsResponse {
   // params holds all the parameters of this module.
-  Params params = 1 [(gogoproto.nullable) = false];
+  Params params = 1 [ (gogoproto.nullable) = false ];
+}
+
+message QueryRegisteredChainRequest { string chainID = 1; }
+
+message QueryRegisteredChainResponse { string chainInfo = 1; }
+
+message QueryAllRegisteredChainsRequest {
+  cosmos.base.query.v1beta1.PageRequest pagination = 1;
+}
+
+message QueryAllRegisteredChainsResponse {
+  RegisteredChains registeredChains = 1;
+  cosmos.base.query.v1beta1.PageResponse pagination = 2;
 }
 
 // this line is used by starport scaffolding # 3

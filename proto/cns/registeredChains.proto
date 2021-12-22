@@ -1,0 +1,6 @@
+syntax = "proto3";
+package strangeloveventures.cns.cns;
+
+option go_package = "github.com/strangelove-ventures/cns/x/cns/types";
+
+message RegisteredChains { map<string, string> chains = 1; }

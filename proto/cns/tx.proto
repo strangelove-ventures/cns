@@ -7,7 +7,15 @@ option go_package = "github.com/strangelove-ventures/cns/x/cns/types";
 
 // Msg defines the Msg service.
 service Msg {
-    // this line is used by starport scaffolding # proto/tx/rpc
+  rpc RegisterChain(MsgRegisterChain) returns (MsgRegisterChainResponse);
+  // this line is used by starport scaffolding # proto/tx/rpc
 }
+
+message MsgRegisterChain {
+  string chainID = 1;
+  string chainInfo = 2;
+}
+
+message MsgRegisterChainResponse { string registerResponse = 1; }
 
 // this line is used by starport scaffolding # proto/tx/message

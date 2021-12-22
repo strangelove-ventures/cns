@@ -2,7 +2,6 @@ package keeper
 
 import (
 	"fmt"
-
 	"github.com/tendermint/tendermint/libs/log"
 
 	"github.com/cosmos/cosmos-sdk/codec"
@@ -20,20 +19,13 @@ type (
 	}
 )
 
-func NewKeeper(
-	cdc codec.BinaryCodec,
-	storeKey,
-	memKey sdk.StoreKey,
-	ps paramtypes.Subspace,
-
-) *Keeper {
+func NewKeeper(cdc codec.BinaryCodec, storeKey, memKey sdk.StoreKey, ps paramtypes.Subspace) *Keeper {
 	// set KeyTable if it has not already been set
 	if !ps.HasKeyTable() {
 		ps = ps.WithKeyTable(types.ParamKeyTable())
 	}
 
 	return &Keeper{
-
 		cdc:        cdc,
 		storeKey:   storeKey,
 		memKey:     memKey,
@@ -43,4 +35,20 @@ func NewKeeper(
 
 func (k Keeper) Logger(ctx sdk.Context) log.Logger {
 	return ctx.Logger().With("module", fmt.Sprintf("x/%s", types.ModuleName))
+}
+
+func (k Keeper) GetRegisteredChain(ctx sdk.Context) {
+
+}
+
+func (k Keeper) SetRegisteredChain(ctx sdk.Context) {
+
+}
+
+func (k Keeper) DeleteRegisteredChain(ctx sdk.Context, index string) {
+
+}
+
+func (k Keeper) GetAllRegisteredChains(ctx sdk.Context) {
+
 }
