@@ -134,10 +134,8 @@ State modifications:
 
 ### Set host’s group
 
-<aside>
-⚠️ Think of a better name
 
-</aside>
+> ⚠️ Think of a better name
 
 ```protobuf
 message MsgSetGroup {

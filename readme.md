@@ -1,6 +1,6 @@
 # Overview
 
-# Synopsis
+## Synopsis
 
 Chain naming service (CNS) is a system that allows blockchains (“controller chains”) in Cosmos to update information about themselves on a blockchain (“host chain”).
 
@@ -18,7 +18,7 @@ CNS on the host chain stores the following information about each controller cha
 
 Currently, the information that will be managed by CNS is stored in a repository on GitHub: [https://github.com/cosmos/chain-registry](https://github.com/cosmos/chain-registry)
 
-# Definitions
+## Definitions
 
 - A “host” chain: a chain on which the CNS module is deployed. This is the chain, where the information about other chains is stored.
 - A “controller” chain: a chain, information about which is stored on the host chain. For example, if CNS is deployed on the Cosmos Hub (the “host” chain), other chains like Osmosis, Crescent and others will be considered “controller” chains, because they will store information about themselves on the “host” chain.
@@ -28,7 +28,7 @@ Currently, the information that will be managed by CNS is stored in a repository
 - An interchain accounts authentication module (ICA AM): a new Cosmos SDK module deployed on controller chains that ensures that only the governance of the controller chain can initiate certain actions (like creating an interchain account on the host chain) and only the particular group can perform certain other actions (like asking the interchain account to change values in CNS).
 - A CNS module (CNS): a new Cosmos SDK module deployed on the host chain that controls which interchain accounts can change which values in the CNS store. The CNS module is responsible for storing information about controller chains.
 
-# Motivation
+## Motivation
 
 The advantages of managing such information on-chain:
 
@@ -49,7 +49,7 @@ The advantages of managing such information on-chain:
 | Bech32 routing       | ❌ programmatically relying on a centralized service for token sending may lead to loss of funds. Needs an off-chain component to work.                                | ✅ each chain can have its own unique prefix.                                                                                                                 |
 | Usernames            | ❌ nobody’s going to want to have a username in a file on Github.                                                                                                      | ✅ Market for second-level names for users: username.chainname. For example, denis.cosmos.                                                                    |
 
-### Chain names assignment
+#### Chain names assignment
 
 For the initial version, chain names are assigned by a group on the Hub manually. Chain names are not purchased and there is no market for them. The reason is there is very little sense in transferring a name from one chain to another. For example, if the “real” Osmosis was assigned a name, what are the chances that Osmosis would need to sell the name to someone else, or even transfer it?
 
@@ -59,7 +59,7 @@ In the next version of CNS usernames could be introduced. Think of chain names a
 
 So, Osmosis, for example, would have a chain name `osmosis`, and users would be able to purchase names like `alice.osmosis`. These names could be NFTs and there could (and should) be a market for them. How these usernames are resolved to addresses and chains is outside of the scope of this document.
 
-# Overview
+## Overview
 
 A high-level overview of the process:
 
@@ -78,7 +78,7 @@ Interacting with CNS is possible through:
 - an interchain account. With an ICA a controller chain’s governance owns the record in CNS. This, however, requires a controller chain to have a ICA controller chain functionality enabled, the group module, and a CNS authentication module installed.
 - a regular account. This is an alternative non-IBC way of interacting with CNS. Useful for chains that don’t have the required modules installed or are not IBC-enabled.
 
-### High-level technical overview
+#### High-level technical overview
 
 Controller networks through governance and a group own (and can modify) information about themselves. The host chain through a group assigns names to networks.
 
@@ -96,7 +96,7 @@ ATOM → transfer/channel-0/uatom → channel-0 (counterparty channel) — You n
 
 [![](/assets/high-level.png)](https://whimsical.com/KN18gj3PgsziNvke2vXY1y)
 
-### Updating CNS information
+#### Updating CNS information
 
 Updating information in the CNS module is important for keeping information about controller chains up to date. The responsibility of updating is delegated by the controller chain’s governance to a specific group. This makes the decision-making process more agile because every change doesn’t have to go through a slow-moving governance process.
 
@@ -114,7 +114,7 @@ Process:
     1. ICS27 module processes the packet and instructs the associated with the controller chain interchain account to broadcast a transaction with a message that contains the required changes to the CNS.
     2. CNS checks that the interchain account has the authority to change the values of a particular chain name associated with the controller chain.
 
-### Registering an interchain account
+#### Registering an interchain account
 
 The information about chains in CNS can be updated by interchain accounts. Before any data about a controller chain can be written to CNS, an interchain account has to be created. An interchain account can only be created as a result of a governance vote on the controller chain.
 
@@ -135,7 +135,7 @@ Process:
 
 Registering an ICA account is only possible through the process above.
 
-## Verify the information in CNS is up-to-date and valid
+### Verify the information in CNS is up-to-date and valid
 
 The controller chain’s governance delegated the responsibility to update information in CNS to a group. However, it is important for the governance of the chain to periodically verify that the information in CNS is indeed correct and up-to-date or invalid. Invalidating might be useful in case the group admin or the group itself becomes malicious and the governance needs to communicate that the info in CNS is no longer valid.
 
@@ -159,7 +159,7 @@ message Network {
 }
 ```
 
-## Verify that the information in CNS is associated with a particular chain
+### Verify that the information in CNS is associated with a particular chain
 
 The controller chain (the governance and the group) has the authority to change information in CNS associated with that chain. However, a group on the host chain should associate the information provided by the controller chain with a specific name and an IBC client. This is important because two chains can submit information claiming they are the “Foo” chain and it’s up to a group on the host chain to decide which one is the one and only “Foo” chain.
 
@@ -180,29 +180,26 @@ message Network {
 }
 ```
 
-<aside>
-❓ Maybe there should be a period after which the name change happens. Let’s say after the host’s group decided to unassign a name, a countdown starts (a week), during which the controller chain can make changes the required changes/updates. If the controller’s group satisfies the requirements of the host’s group, the host’s group can send another tx to assign a name. Name assignment happens instantly.
+> ❓ Maybe there should be a period after which the name change happens. Let’s say after the host’s group decided to unassign a name, a countdown starts (a week), during which the controller chain can make changes the required changes/updates. If the controller’s group satisfies the requirements of the host’s group, the host’s group can send another tx to assign a name. Name assignment happens instantly.
 
-</aside>
-
-# Architecture
+## Architecture
 
 The CNS system is implemented as two Cosmos SDK modules:
 
 - ICA authentication module (ICA AM)
 - CNS module
 
-## ICA authentication module (ICA AM)
+### ICA authentication module (ICA AM)
 
 The ICA authentication module is deployed on controller chains. The purpose of ICA AM is to ensure that only governance can send certain messages (register an ICA account) and that only a particular group can send certain other messages (update CNS values).
 
-## CNS module
+### CNS module
 
 The CNS module is deployed on the host chain. The main purpose of the CNS module is to store the association between chain names and chain data of controller chains and to control which interchain account on the host chain is authorized to update the corresponding chain data.
 
-# User archetypes
+## User archetypes
 
-## Interchain wallet user
+### Interchain wallet user
 
 “I want to send tokens from Cosmos Hub to Osmosis”.
 
@@ -210,7 +207,7 @@ Cosmos Hub and Osmosis are chain names that are resolved to chain details using 
 
 Type: indirect novice user.
 
-## Interchain wallet developer
+### Interchain wallet developer
 
 Builds a wallet that integrates with CNS.
 
@@ -220,7 +217,7 @@ Builds a wallet that integrates with CNS.
 
 Type: experienced developer.
 
-## Controller governance voter
+### Controller governance voter
 
 Type: experienced/novice user.
 
@@ -231,7 +228,7 @@ Actions:
 
 Frequency of use: every 4-8 weeks.
 
-## Controller group admin
+### Controller group admin
 
 Type: experienced user.
 
@@ -242,7 +239,7 @@ Actions:
 
 Frequency of use: every 4-8 weeks.
 
-## Controller group member
+### Controller group member
 
 Type: experienced user.
 
@@ -253,7 +250,7 @@ Actions:
 
 Frequency of use: every 2-3 weeks.
 
-## Host governance voter
+### Host governance voter
 
 Type: experienced/novice user.
 
@@ -264,7 +261,7 @@ Actions:
 
 Frequency of use: every 4-8 weeks.
 
-## Host group admin
+### Host group admin
 
 Type: experienced user.
 
@@ -275,7 +272,7 @@ Actions:
 
 Frequency of use: every 4-8 weeks.
 
-## Host group member
+### Host group member
 
 Type: experienced user.
 
