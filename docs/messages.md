@@ -22,6 +22,7 @@ State modifications:
 
 - Creates a new group where admin address is `msg.address`.
 - Creates a new group policy.
+- Set the global `group` value to the group ID.
 - Sends an IBC packet to the host chain to register a specific interchain account.
 - Stores an association between a group policy address and a registered interchain account address.
 
@@ -49,6 +50,26 @@ State modifications:
 - On the host chain:
     - Get `Network` by `msg.networkID`. Set `verified` to `msg.verified`.
     - Set `verifiedDate` to the current block’s timestamp.
+
+### Change group admin
+
+> TODO: think of a better message name.
+
+```protobuf
+message MsgChangeAdmin {
+  string admin;
+}
+```
+
+Fail conditions:
+
+- `msg.admin` is the current group admin address
+
+State modifications:
+
+- Set the admin of the group (with the group ID that matches the value stored in the global `group` in the state) to `msg.admin`.
+
+> TODO: should this message also kick out all the members of the group? Technically, this is the responsibility of the admin, but this message will likely be used when the governance loses the trust in the admin and the members (that the admin selected), so it might makes sense to rmeove all members from the group.
 
 ## Chain naming service module (on the host chain)
 
