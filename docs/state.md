@@ -70,34 +70,45 @@ A `Network` groups all the testnets and the mainnet (if exists) of a specific bl
 
 `id` is an incrementing integer used to identify a network in CNS. `id` is used for internal purposes and not to identify the network on the Interchain. `id` is not the same as the chain name or a Tendermint Core's chain ID.
 
-`owner` is an address of an interchain account or a regular account that created the network and has the authority to modify the values associated with the network.
+`owner` is an address of an interchain account or a regular account that created the network and has the authority to modify the values associated with the network. The `owner` is set automatically when the network is first created.
 
 `verified` is a boolean value and `verifiedData` is a string that represents a block timestamp. Verification is a process when the governance of the controller chain verifies that the information in CNS for the blockchain network they represent is correct and up to date. Both values can only be changed by governance of the controller chain through `MsgVerifyNetwork`.
 
-## Types
+`details` define information common to all blockchain in the network.
+
+### Network Details
 
 ```protobuf
-message Network { // Network has many chains
-	uint64 id = 1;
-	string owner = 4; // ICA or regular account address
-	bool verified = 6; // Updated by the group on the controller chain
-	string verifiedDate = 7; // Updated by the group on the controller chain
-}
-
 message NetworkDetails {
 	uint64 mainnet; // ID of the mainnet chain
 	uint64 slip44;
-	bytes metadata;
 	repeated Algorithm algorithms;
+	bytes metadata;
 }
+```
 
+Network details contains information that can be edited by the `owner` address of network.
+
+`mainnet` represents the ID of the current active mainnet. The value is an integer that identifies a `Chain` in CNS. It is not a Tendermint Core's chain ID, but rather an internal to CNS integer ID.
+
+> TODO: What should the value be if a network doesn't yet have a mainnnet? `0` maybe?
+
+`slip44` is an integer that identifies the coin type of the native asset of the chain. For example, for Cosmos Hub's ATOM the value would be `118` as per [SLIP-0044](https://github.com/satoshilabs/slips/blob/master/slip-0044.md).
+
+`algorithms` are parameters of the elliptic curve used by the network's cryptography.
+
+```protobuf
 enum Algorithm {
 	SECP256K1 = 0;
 	ETHSECP256K1 = 1;
 	ED25519 = 2;
 	SR25519 = 3;
 }
+```
 
+## Types
+
+```protobuf
 message Chain { // Chain belongs to a network
 	uint64 id;
 	uint64 networkID;
