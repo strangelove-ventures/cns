@@ -47,11 +47,32 @@ Let’s say you need to send JUNO to Osmosis.
 
 ## State
 
-```protobuf
-Chains: [Network ID] -> []uint64 Chain IDs
-Network: [Network ID] -> Network
-Chain Name: [Chain Name] -> uint64 Network ID
 ```
+Network [Network ID] -> Network
+Chains: [Network ID] -> []uint64 Chain IDs
+Chain name: [Chain Name] -> uint64 Network ID
+Group admin address: admin -> string
+```
+
+### Network
+
+```protobuf
+message Network { // Network has many chains
+	uint64 id = 1;
+	string owner = 4; // ICA or regular account address
+	bool verified = 6; // Updated by the group on the controller chain
+	string verifiedDate = 7; // Updated by the group on the controller chain
+  NetworkDetails details = 8;
+}
+```
+
+A `Network` groups all the testnets and the mainnet (if exists) of a specific blockchain network and defines the common properties.
+
+`id` is an incrementing integer used to identify a network in CNS. `id` is used for internal purposes and not to identify the network on the Interchain. `id` is not the same as the chain name or a Tendermint Core's chain ID.
+
+`owner` is an address of an interchain account or a regular account that created the network and has the authority to modify the values associated with the network.
+
+`verified` is a boolean value and `verifiedData` is a string that represents a block timestamp. Verification is a process when the governance of the controller chain verifies that the information in CNS for the blockchain network they represent is correct and up to date. Both values can only be changed by governance of the controller chain through `MsgVerifyNetwork`.
 
 ## Types
 
