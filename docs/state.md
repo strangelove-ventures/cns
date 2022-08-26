@@ -48,10 +48,11 @@ Let’s say you need to send JUNO to Osmosis.
 ## State
 
 ```
-Network [Network ID] -> Network
-Chains: [Network ID] -> []uint64 Chain IDs
-Chain name: [Chain Name] -> uint64 Network ID
-Group admin address: admin -> string
+Network/[Network ID uint64] -> Network
+Chain/[Network ID]-[Chain ID] -> Chain
+ChainName/[Chain Name string] -> uint64 Network ID
+Asset/[Asset ID] -> Asset
+Group -> uint64
 ```
 
 ### Network
@@ -106,15 +107,20 @@ enum Algorithm {
 }
 ```
 
-## Types
+### Chain
 
 ```protobuf
 message Chain { // Chain belongs to a network
 	uint64 id;
-	uint64 networkID;
 	ChainDetails details;
 }
+```
 
+A `Chain` is either a testnet or a mainnet within a `Network`. A network can have any number of testnets and a single mainnet. A chain is assumed to be a testnet, unless its ID is specified in `Network.NetworkDetails.mainnet`.
+
+### Chain Details
+
+```protobuf
 message ChainDetails {
 	unit64 stakingAssetID = 1;
 	string chainID = 2;
@@ -134,7 +140,19 @@ message ChainDetails {
 	repeated ChainAssets assets = 16;
 	repeated ChainClients clients = 17;
 }
+```
 
+`stakingAssetID` is a CNS ID of the asset used for staking purposes on the chain.
+
+`chainID` is the Tendermint Core's `chain-id` value. This value does not identify the chain on CNS or on the interchain, but rather is used by Tendermint Core and Cosmos SDK to distinguish between chains within the same network.
+
+`description` is a human readable description of the chain. For example, if a testnet was launched specifically for a hackathon, this might be mentioned in the description. Or if a particular testnet is the main one that developers should use to test their applications.
+
+`metadata` may contain any additional data about the chain that doesn't belong in other fields. It is recommended to use JSON encoded data. If enough chains use the same metadata fields, the fields may be added to CNS.
+
+`prefix` is a bech32 human-readable prefix used to denote an address type. Refer to Cosmos SDK documentation to learn more about how different address types are used.
+
+```protobuf
 message Prefix {
 	string accAddr = 1;
 	string accPub = 2;
@@ -143,21 +161,32 @@ message Prefix {
 	string consAddr = 5;
 	string consPub = 6;
 }
+```
 
+`genesis` defines the genesis file of the chain. It is useful for node operators who need a genesis file to be able to start a node. `url` 
+
+```protobuf
 message Genesis {
 	string url = 1;
 	string hash = 2;
 }
+```
+`gas` is the amount of gas that is recommended to use when broadcasting transactions for this particular chain. The gas amount is dependent on the type of messages included in a transaction, so a medium gas amount consumed for transactions with bank's `MsgSend` should be provided.
 
+```protobuf
 message Gas {
 	uint64 low = 1;
 	uint64 average = 2;
 	uint64 high = 3;
 }
+```
 
+`sourcecode` contains the information on how to get the chain's binary executable file.
+
+```protobuf
 message Sourcecode {
 	string url = 1;
-	string hash = 2; // Commit hash
+	string hash = 2;
 	string daemon = 3;
 	string home = 4;
 	Version version = 5;
@@ -165,12 +194,27 @@ message Sourcecode {
 	repeated Module modules = 7; // Includes Cosmos SDK, Tendermint Core, CosmWasm and others
   // Prerequisites, maybe? Like system requirements - a nice to have
 }
+```
 
+`url` is the URL of the repository with the source code of the chain. The URL should be in a format that can be used with `git clone [URL]`.
+
+`hash` is the commit hash of the current version of the software.
+
+`daemon` is the name of the executable file for the blockchain node.
+
+`home` is the default data directory for the blockchain data.
+
+`version` defines both recommended (current) and all the versions, compatible with the current one.
+
+```protobuf
 message Version {
 	string recommended = 1;
-	repeated compatible = 2;
+	repeated string compatible = 2;
 }
+```
+`executables` contains a list of `Executable` that define URLs of binaries for different OSes and architectures.
 
+```protobuf
 message Executable {
 	Arch arch = 1;
 	OS os = 2;
@@ -188,7 +232,11 @@ enum OS {
 	DARWIN = 1;
 	WINDOWS = 2;
 }
+```
 
+## Types
+
+```protobuf
 message Module {
 	string url = 1; // This is a source code URL. Acts as an identifier
 	string version = 2;
