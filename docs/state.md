@@ -234,15 +234,23 @@ enum OS {
 }
 ```
 
-## Types
+`modules` contains a list of components that exist on the blockchain. Those include Cosmos SDK modules, Tendermint Core, IBC modules, possibly even CosmWasm contracts. This field is used to guide dapp developers on what is available on the chain (does it have a DEX, CosmWasm, etc.).
 
 ```protobuf
 message Module {
-	string url = 1; // This is a source code URL. Acts as an identifier
+	string url = 1;
 	string version = 2;
 	bool enabled = 3;
 }
+```
 
+The `url` contains the URL to the source code of the module (e.g. https://github.com/tendermint/tendermint) and acts as an identifier.
+
+`version` is the version of the software and `enabled` indicates whether the module is currently enabled on the blockchain.
+
+## Types
+
+```protobuf
 enum Status {
 	LIVE = 0;
 	UPCOMING = 1;
