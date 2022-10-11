@@ -129,7 +129,7 @@ Fail conditions:
 State modification:
 
 - Create a new `Network`.
-    - Set `[id](http://Network.id)` as an incrementing integer
+    - Set `id` as an incrementing integer
     - Set `owner` as `msg.owner`
     - Set `name` as an empty string
     - Set `verified` as `false`
