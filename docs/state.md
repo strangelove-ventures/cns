@@ -248,7 +248,7 @@ The `url` contains the URL to the source code of the module (e.g. https://github
 
 `version` is the version of the software and `enabled` indicates whether the module is currently enabled on the blockchain.
 
-## Types
+Going back to `ChainDetails`, the `status` field defines whether the chain is online and operational (`LIVE`), or it hasn't been launched yet (`UPCOMING`), or it is offline (`KILLED`). Most mainnets will be permanently in the `LIVE` state, however, for testnets it might be incredibly important to know which ones are still online and which ones have been deprecated.
 
 ```protobuf
 enum Status {
@@ -256,31 +256,59 @@ enum Status {
 	UPCOMING = 1;
 	KILLED = 2;
 }
+```
 
-message Explorer {
-  string name = 1;
-  string url = 2;
-}
+`fees` contains a list of ID that represent assets that will be accepted as fees for the network. Even though validators are the ones setting gas prices and thus determining the tokens acceptable as fees, one can't query validators to know which tokens they accept. Having denoms listed in CNS will help clients to determine which tokens should be used as fees.
 
+Both `peers` and `seeds` contain list of peers that help node operators in peer/seed discovery.
+
+```protobuf
 message Peer {
   string id = 1;
   string address = 2;
   string provider = 3;
 }
+```
 
+`apis` contain a list of APIs that help clients know which API endpoints they can use to query data from chain.
+
+```protobuf
 message API {
 	APIType type = 1;
   string address = 1;
   string provider = 2;
   bool archive = 3; // default: false
 }
+```
+APIs can be of different types. If a provider offers more than one type of API, those should be stored as separate API records.
 
+```protobuf
 enum APIType {
 	RPC = 0;
 	API = 1;
 	GPRC = 2;
 }
+```
+`address` is a URL that can be used to directly query the API.
 
+`provider` is a string that describes the entity that offers the API.
+
+`archive` helps clients understand whether the API enpoints is active or has been acrhived.
+
+`explorers` contains a list of URLs to blockchain explorers.
+
+```protobuf
+message Explorer {
+  string name = 1;
+  string url = 2;
+}
+```
+
+`assetsNative` is a list of asset IDs that are native tokens of the chain.
+
+`assets` describe
+
+```protobuf
 message ChainAsset {
 	uint64 assetID = 1;
 	string path = 2;
