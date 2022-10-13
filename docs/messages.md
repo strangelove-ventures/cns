@@ -11,6 +11,10 @@ message MsgRegisterAccount {
 }
 ```
 
+The information about chains in CNS can be updated by interchain accounts. Before any data about a controller chain can be written to CNS, an interchain account has to be created. An interchain account can only be created as a result of a governance vote on the controller chain.
+
+[![](../assets/registering-ica.png)](https://whimsical.com/VFCP16ja6B7kvkTSXhGW89)
+
 Authority: controller’s governance.
 
 Fail conditions:
