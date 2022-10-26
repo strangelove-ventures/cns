@@ -6,8 +6,8 @@
 
 ```protobuf
 message MsgRegisterAccount {
-	string address; // admin address
-	cosmos.base.v1beta1.Coin amount; // to send to the policy address
+  repeated MemberRequest members = 1;
+	cosmos.base.v1beta1.Coin amount = 2; // to send to the policy address
 }
 ```
 
@@ -24,8 +24,8 @@ Fail conditions:
 
 State modifications:
 
-- Creates a new group where admin address is `msg.address`.
-- Creates a new group policy.
+- Creates a new group with `CreateGroupWithPolicy` with given members
+- Group's admin is set as a policy address
 - Set the global `group` value to the group ID.
 - Sends an IBC packet to the host chain to register a specific interchain account.
 - Stores an association between a group policy address and a registered interchain account address.
@@ -60,20 +60,18 @@ State modifications:
 > TODO: think of a better message name.
 
 ```protobuf
-message MsgChangeAdmin {
-  string admin;
+message MsgUpdateGroupMembers {
+  repeated MemberRequest members = 1;
 }
 ```
 
 Fail conditions:
 
-- `msg.admin` is the current group admin address
+- `members` is empty
 
 State modifications:
 
-- Set the admin of the group (with the group ID that matches the value stored in the global `group` in the state) to `msg.admin`.
-
-> TODO: should this message also kick out all the members of the group? Technically, this is the responsibility of the admin, but this message will likely be used when the governance loses the trust in the admin and the members (that the admin selected), so it might makes sense to rmeove all members from the group.
+- Call group module's `UpdateGroupMembers` and update the members of the group (get group ID from the global value)
 
 ## Chain naming service module (on the host chain)
 
